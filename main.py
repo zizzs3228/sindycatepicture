@@ -4,7 +4,17 @@ import re
 from PIL import Image, ImageFont, ImageDraw
 import datetime
 
-r = requests.get('https://coinmarketcap.com/').text
+headers = {
+    'Connection': 'keep-alive',
+    'Cache-Control': 'max-age=0',
+    'Upgrade-Insecure-Requests': '1',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+    'DNT': '1',
+    'Accept-Encoding': 'gzip, deflate, lzma, sdch',
+    'Accept-Language': 'ru-RU,ru;q=0.8,en-US;q=0.6,en;q=0.4'
+}
+r = requests.get('https://coinmarketcap.com/', headers=headers).text
 soup = BeautifulSoup(r, "lxml")
 MCAP = soup.find(href="/charts/", class_="cmc-link").text
 MCAPC = re.findall(r'\d+\.?\d+', MCAP)
@@ -13,66 +23,74 @@ MCAP = MCAPC[0]+MCAPC[1]+MCAPC[2]+MCAPC[3]
 DOM = soup.find(href="/charts/#dominance-percentage", class_="cmc-link").text
 DOMC = re.findall(r'\d+\.?\d+', DOM)
 
-r = requests.get('https://coinmarketcap.com/currencies/bitcoin/').text
+r = requests.get('https://coinmarketcap.com/currencies/bitcoin/', headers=headers).text
 soup = BeautifulSoup(r, "lxml")
 BTC = soup.find(class_="priceValue").text
 
-r = requests.get('https://coinmarketcap.com/currencies/ethereum/').text
+r = requests.get('https://coinmarketcap.com/currencies/ethereum/', headers=headers).text
 soup = BeautifulSoup(r, "lxml")
 ETH = soup.find(class_="priceValue").text
 
-r = requests.get('https://coinmarketcap.com/currencies/BNB/').text
+r = requests.get('https://coinmarketcap.com/currencies/BNB/', headers=headers).text
 soup = BeautifulSoup(r, "lxml")
 BNB = soup.find(class_="priceValue").text
 
-r = requests.get('https://www.investing.com/currencies/usd-rub').text
+
+r = requests.get('https://www.profinance.ru/chart/usdrub/', headers=headers).text
 soup = BeautifulSoup(r, "lxml")
-USD = soup.find_all(class_="text-2xl")[2].text
+RUB = soup.find_all('table')[13]
+USD = RUB.find_all('td')[5].text
+EUR = RUB.find_all('td')[8].text
 
-r = requests.get('https://www.investing.com/currencies/eur-rub').text
+
+r = requests.get('https://www.marketwatch.com/investing/future/brn00?countrycode=uk', headers=headers).text
 soup = BeautifulSoup(r, "lxml")
-EUR = soup.find_all(class_="text-2xl")[2].text
+BRENT = soup.find(class_='value').text
 
-r = requests.get('https://www.investing.com/commodities/metals').text
+
+r = requests.get('https://www.marketwatch.com/investing/index/spx', headers=headers).text
 soup = BeautifulSoup(r, "lxml")
-GOLD = soup.find(class_="pid-8830-last").text
-COPPER = soup.find(class_="pid-8831-last").text
-SILVER = soup.find(class_="pid-8836-last").text
+SPX = soup.find(class_='value').text
 
-r = requests.get('https://www.investing.com/indices/us-spx-500').text
+r = requests.get('https://www.marketwatch.com/investing/index/comp', headers=headers).text
 soup = BeautifulSoup(r, "lxml")
-SPX = soup.find_all(class_="text-2xl")[2].text
+NDX = soup.find(class_='value').text
 
-r = requests.get('https://www.investing.com/indices/nq-100').text
+
+r = requests.get('https://www.marketwatch.com/investing/future/gold?mod=mw_quote_switch', headers=headers).text
 soup = BeautifulSoup(r, "lxml")
-NAS = soup.find_all(class_="text-2xl")[2].text
+GOLD = soup.find(class_='value').text
 
-
-r = requests.get('https://www.investing.com/commodities/brent-oil').text
+r = requests.get('https://www.marketwatch.com/investing/future/silver?mod=mw_quote_switch', headers=headers).text
 soup = BeautifulSoup(r, "lxml")
-BRENT = soup.find_all(class_="text-2xl")[2].text
+SILVER = soup.find(class_='value').text
 
-r = requests.get('https://fapi.coinglass.com/api/futures/longShortRate?symbol=BTC&timeType=2').text
+r = requests.get('https://tradingeconomics.com/commodity/copper', headers=headers).text
+soup = BeautifulSoup(r, "lxml")
+COPPER = soup.find_all(id='p')[2].text
+
+
+r = requests.get('https://fapi.coinglass.com/api/futures/longShortRate?symbol=BTC&timeType=2', headers=headers).text
 LONG = re.findall(r'\d+\.?\d+', r)
 
-r = requests.get('https://fapi.coinglass.com/api/fundingRate/v2/home').text
+r = requests.get('https://fapi.coinglass.com/api/fundingRate/v2/home', headers=headers).text
 soup = BeautifulSoup(r, "lxml")
 FUNDING = re.findall(r'\d+\.?\d+', r)
 #print(FUNDING[0])
 
-r = requests.get('https://fapi.coinglass.com/api/futures/liquidation/info?symbol=BTC&timeType=1&size=12').text
+r = requests.get('https://fapi.coinglass.com/api/futures/liquidation/info?symbol=BTC&timeType=1&size=12', headers=headers).text
 soup = BeautifulSoup(r, "lxml")
 BTCLIQS = re.findall(r'\d+\.?\d+', r)
 
-r = requests.get('https://fapi.coinglass.com/api/futures/liquidation/info?symbol=ETH&timeType=1&size=12').text
+r = requests.get('https://fapi.coinglass.com/api/futures/liquidation/info?symbol=ETH&timeType=1&size=12', headers=headers).text
 soup = BeautifulSoup(r, "lxml")
 ETHLIQS = re.findall(r'\d+\.?\d+', r)
 
-r = requests.get('https://fapi.coinglass.com/api/futures/liquidation/info?symbol=ETC&timeType=1&size=12').text
+r = requests.get('https://fapi.coinglass.com/api/futures/liquidation/info?symbol=ETC&timeType=1&size=12', headers=headers).text
 soup = BeautifulSoup(r, "lxml")
 ETCLIQS = re.findall(r'\d+\.?\d+', r)
 
-r = requests.get('https://bitstat.top/fear_greed.php').text
+r = requests.get('https://bitstat.top/fear_greed.php', headers=headers).text
 soup = BeautifulSoup(r, "lxml")
 INDEX = soup.find(class_="trx-index").text
 #print(INDEX)
@@ -113,10 +131,10 @@ draw.text((980, 193), BNB, font=fontH, fill='#7D7DC9')
 draw.text((1350, 192), f"{USD[0:5]} ₽", font=font, fill='#7D7DC9')
 draw.text((1660, 192), f"{EUR[0:5]} ₽", font=font, fill='#7D7DC9')
 draw.text((210, 343), f"${GOLD}", font=font, fill='#7D7DC9')
-draw.text((600, 343), f"${SILVER}", font=font, fill='#7D7DC9')
+draw.text((600, 343), f"${SILVER[0:5]}", font=font, fill='#7D7DC9')
 draw.text((970, 343), f"${COPPER}", font=font, fill='#7D7DC9')
 draw.text((320, 501), f"${SPX}", font=font, fill='#7D7DC9')
-draw.text((320, 595), f"${NAS}", font=font, fill='#7D7DC9')
+draw.text((320, 595), f"${NDX}", font=font, fill='#7D7DC9')
 draw.text((320, 685), f"${BRENT}", font=font, fill='#7D7DC9')
 draw.text((590, 947), f"${BTCLIQS[-3]} M", font=font, fill='#7D7DC9')
 draw.text((240, 947), f"${ETHLIQS[-3]} M", font=font, fill='#7D7DC9')
